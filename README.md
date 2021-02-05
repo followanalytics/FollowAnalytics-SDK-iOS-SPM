@@ -26,7 +26,7 @@ Once the integration is finished, we highly recommend you test the setup. Then, 
     **Before you start**, be sure to have a *Podfile*. You could create one by writing `pod init` in your terminal in your project. To open your *Podfile*, you could find it in your *Workspace*, or by writing `open -a Xcode Podfile` in the terminal.
 
 
-1.  Add `pod 'FollowAnalytics','~> 6.9.0'` in the _Podfile_ (see screenshot below)
+1.  Add `pod 'FollowAnalytics','~> 6.9.1'` in the _Podfile_ (see screenshot below)
     ![](https://s3-eu-west-1.amazonaws.com/fa-assets/documentation/podfile-add-pod.png)
     
 2.  Run `pod repo update` from the command line. This will enable CocoaPods to detect the latest available version of FollowAnalytics.
@@ -43,25 +43,23 @@ Now FollowAnalytics is successfully installed.
 !!! note "Starting with Swift Package Manager"
     Swift Package Manager is the Apple tool for native implementation of Swift dependencies. To learn more about this you may refer to the [official documentation](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
 
-| Package Link: https://github.com/followanalytics/FollowAnalytics-SDK-iOS-SPM
-
-1. Head over to your project in Xcode and Click File -> Swift Packages -> Add Package Dependency.
+1. Head over to your project in Xcode and click **File** -> **Swift Packages** -> **Add Package Dependency**:
 
     ![](https://fa-assets.s3.amazonaws.com/documentation/spm_step1.jpg)
 
-2. From the wizard enter the package link and proceed.
+2. Enter the SDK package repository URL `https://github.com/followanalytics/FollowAnalytics-SDK-iOS-SPM` and click **Next**:
 
     ![](https://fa-assets.s3.amazonaws.com/documentation/spm_step2.jpg)
 
-3. Select the pretended version or select master to keep up with the latest versions and complete.
+3. Select either `Version` with the desired rule, or `Branch` with `master` to keep up with the latest version and click **Next**:
 
     ![](https://fa-assets.s3.amazonaws.com/documentation/spm_step3.jpg)
 
-4. Select your project target to the FollowAnalytics framework and select your Notification Extension to the FANotificationExtension framework.
+4. Select your app target for the FollowAnalytics framework and select your Notification Service extension target for the FANotificationExtension framework, then click **Finish**:
 
     ![](https://fa-assets.s3.amazonaws.com/documentation/spm_step4.jpg)
 
-5. After complete the dependencies should exist on the left menu of your project.
+5. After completed those steps the Swift Package dependencies should appear on the left menu of your project:
 
     ![](https://fa-assets.s3.amazonaws.com/documentation/spm_step5.jpg)
 
@@ -2069,19 +2067,47 @@ To customize the SDK behavior, you must define your desired SDK parameters by se
 - Before v6.9.0, if the `apiMode` was not explicitly defined in the `Configuration`, the SDK was automatically changing it based on the `isVerbose` value. From v6.9.0 the SDK will no longer change the `apiMode` automatically on real device and we recommend that you set it explicitly in your code, based on the Xcode `DEBUG` flag like this:
     
 ```Objective-C tab=
-#if DEBUG
-cfg.apiMode = FollowAnalyticsAPIModeDev;
-#else
-cfg.apiMode = FollowAnalyticsAPIModeProd;
-#endif
+#import <FollowAnalytics/FollowAnalytics.h>
+
+@implementation AppDelegate
+- (BOOL)application:(UIApplication*)application
+  didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
+  // ....
+  FollowAnalyticsConfiguration* configuration = [FollowAnalyticsConfiguration
+    configurationWith:^(FollowAnalyticsConfiguration* _Nonnull config) {
+      config.apiKey = @"YOUR API KEY";
+      #if DEBUG
+      config.apiMode = FollowAnalyticsAPIModeDev;
+      #else
+      config.apiMode = FollowAnalyticsAPIModeProd;
+      #endif
+    }];
+  [FollowAnalytics startWithConfiguration:configuration startupOptions:launchOptions];
+  //....
+}
+// ..
+@end
 ```
 
 ```Swift tab=
-#if DEBUG
-cfg.apiMode = FollowAnalyticsAPIMode.dev
-#else
-cfg.apiMode = FollowAnalyticsAPIMode.prod
-#endif
+import FollowAnalytics
+
+class AppDelegate: UIResponder, UIApplicationDelegate {
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions
+    launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    // ....
+    let configuration = FollowAnalyticsConfiguration.init { (config) in
+      config.apiKey = "YOUR API KEY"
+      #if DEBUG
+      config.apiMode = .dev
+      #else
+      config.apiMode = .prod
+      #endif
+    }
+    FollowAnalytics.start(with: configuration, startupOptions: launchOptions)
+    // ....
+  }
+}
 ```
 
 #### Updating from 6.4 to 6.5
