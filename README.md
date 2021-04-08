@@ -14,7 +14,7 @@ In this section, you will find the basic steps to integrate the SDK into your ap
 * [Installing the SDK in your project from CocoaPods](#installation-from-cocoapods)
 * [Installing the SDK in your project with Switft Package Manager](#installation-from-swift-package-manager)
 * [Initializing the SDK using your API key](#initialize-the-sdk-with-your-api-key)
-* [Setting up notifications](#setting-up-notifications)
+* [Setting up push notifications](#setting-up-push-notifications)
 
 Once the integration is finished, we highly recommend you test the setup. Then, you can start [tagging events and saving attributes](#analytics) in your app.
 
@@ -23,10 +23,10 @@ Once the integration is finished, we highly recommend you test the setup. Then, 
 !!! note "Starting with CocoaPods"
     The best way to install the SDK is with CocoaPods. This will allow you to easily update the SDK when new versions are released. If you have not installed CocoaPods yet, you may refer to [this site](https://cocoapods.org/#install), where you can install Cocoapods.
 
-    **Before you start**, be sure to have a *Podfile*. You could create one by writing `pod init` in your terminal in your project. To open your *Podfile*, you could find it in your *Workspace*, or by writing `open -a Xcode Podfile` in the terminal.
+    **Before you start**, make sure to have a *Podfile*. You could create one by writing `pod init` in your terminal in your project. To open your *Podfile*, you could find it in your *Workspace*, or by writing `open -a Xcode Podfile` in the terminal.
 
 
-1.  Add `pod 'FollowAnalytics','~> 6.9.1'` in the _Podfile_ (see screenshot below)
+1.  Add `pod 'FollowAnalytics','~> 6.9.2'` in the _Podfile_ (see screenshot below)
     ![](https://s3-eu-west-1.amazonaws.com/fa-assets/documentation/podfile-add-pod.png)
     
 2.  Run `pod repo update` from the command line. This will enable CocoaPods to detect the latest available version of FollowAnalytics.
