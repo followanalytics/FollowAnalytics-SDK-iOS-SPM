@@ -1,4 +1,4 @@
-sdk_version: iOS v6.9
+sdk_version: iOS v7.0
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ Once the integration is finished, we highly recommend you test the setup. Then, 
     **Before you start**, make sure to have a *Podfile*. You could create one by writing `pod init` in your terminal in your project. To open your *Podfile*, you could find it in your *Workspace*, or by writing `open -a Xcode Podfile` in the terminal.
 
 
-1.  Add `pod 'FollowAnalytics','~> 6.9.2'` in the _Podfile_ (see screenshot below)
+1.  Add `pod 'FollowAnalytics','~> 7.0.0'` in the _Podfile_ (see screenshot below)
     ![](https://s3-eu-west-1.amazonaws.com/fa-assets/documentation/podfile-add-pod.png)
     
 2.  Run `pod repo update` from the command line. This will enable CocoaPods to detect the latest available version of FollowAnalytics.
@@ -136,7 +136,7 @@ Your code should look like this:
       #else
       config.apiMode = FollowAnalyticsAPIModeProd;
       #endif
-    }];
+  }];
   [FollowAnalytics startWithConfiguration:configuration startupOptions:launchOptions];
   //....
 }
@@ -673,8 +673,8 @@ The SDK take care of displaying campaigns, and provide you ways to customize and
 
 * Add rich notifications and badge management capabilities to your app thanks to [FANotificationExtension](#notification-service-extension-framework)
 * Handle link opening (website URLs, app links, and deep links) with the implementation of the [shouldOpenURL](#implement-custom-behavior-on-url-opening) callback
-* Implement custom behavior on notification tap or reception thanks to the [onNotificationTapped](#implement-custom-behavior-on-notification-tap) and [onNotificationReceived](#implement-custom-behavior-on-push-reception) callbacks
-* Implement custom behavior on native In-App's buttons tap thanks to the [onNativeInAppButtonTapped](#implement-custom-behavior-on-native-alert-button-tap) callback
+* Implement custom behavior on notification tap or reception thanks to the [onNotificationAction](#implement-custom-behavior-on-notification-action) and [onPushMessageReceived](#implement-custom-behavior-on-push-reception) callbacks
+* Implement custom behavior on native In-App's buttons tap thanks to the [onInAppNativeAction](#implement-custom-behavior-on-native-inapp-action) callback
 
 ### Notification Service Extension Framework
 
@@ -829,8 +829,8 @@ FollowAnalyticsConfiguration* configuration = [FollowAnalyticsConfiguration
     configurationWith:^(FollowAnalyticsConfiguration* _Nonnull config) {
         ...
         config.appGroup = @"group.your.identifier";
-    };
-}];
+    }
+];
 ```
 
 ```Swift tab=
@@ -938,19 +938,19 @@ Using our platform, when creating a Push Campaign, it's possible to set a badge 
 Using our SDK you can set, increment or get the badge number through the following methods respectively:
 
 ```Objective-C tab=
-[FABadge setBadge:INTEGER]; // Set the value of the icon badge number
-[FABadge updateBadgeBy:INTEGER]; // Update the value of the icon badge number
-[FABadge badge]; // Get the value of the icon badge number
+[FollowAnalytics.badge setBadge:INTEGER]; // Set the value of the icon badge number
+[FollowAnalytics.badge updateBadgeBy:INTEGER]; // Update the value of the icon badge number
+[FollowAnalytics.badge badge]; // Get the value of the icon badge number
 ```
 
 ```Swift tab=
-FABadge.setBadge(Int) // Set the value of the icon badge number
-FABadge.updateBadgeBy(Int) // Update the value of the icon badge number
-FABadge.badge // Get the value of the icon badge number
+FollowAnalytics.badge.setBadge(Int) // Set the value of the icon badge number
+FollowAnalytics.badge.updateBadgeBy(Int) // Update the value of the icon badge number
+FollowAnalytics.badge.badge // Get the value of the icon badge number
 ```
 
-!!! warning "Prefer to use FABadge instead of UIKit"
-    Even though you can update the badge number programmatically using the Apple UIKit [`applicationIconBadgeNumber`](https://developer.apple.com/documentation/uikit/uiapplication/1622918-applicationiconbadgenumber), it is required to use our FABadge public methods to keep incrementing correctly the badge number on future push receptions. 
+!!! warning "Prefer to use FollowAnalytics.badge instead of UIKit"
+    Even though you can update the badge number programmatically using the Apple UIKit [`applicationIconBadgeNumber`](https://developer.apple.com/documentation/uikit/uiapplication/1622918-applicationiconbadgenumber), it is required to use our FollowAnalytics.badge public methods to keep incrementing correctly the badge number on future push receptions. 
 
 ### Geofencing triggers and location conditions
 
@@ -981,9 +981,9 @@ FollowAnalyticsConfiguration* configuration = [FollowAnalyticsConfiguration
 
             // Returning `YES` tells the SDK to open the URL.
             return YES;
-        }
-    };
-}];
+        };
+    }
+];
 ```
 
 ```Swift tab=
@@ -1141,7 +1141,7 @@ static func setOptInNotifications(state: Bool)
     
     - Check the return value of `FollowAnalytics.getPushNotificationsRegistrationStatus()` which is `true` only if the iOS system notification authorization is allowed **AND** the SDK opt-in notifications status is `true`.
     - If `false`, display a message and button to invite your user to enable the iOS system notification authorization.
-    - Call `FollowAnalytics.openNotificationSettingsEventually()` when the user taps the button. The method will take care of either displaying the notification authorization request alert, or directing to the iOS app settings screen. This will allow the user to enable notifications.
+    - Call `FollowAnalytics.openNotificationSettingsIfNeeded()` when the user taps the button. The method will take care of either displaying the notification authorization request alert, or directing to the iOS app settings screen. This will allow the user to enable notifications.
     
     Another possibility is to bypass the first two steps and only implement the last one.
 
@@ -1201,7 +1201,7 @@ if (@available(iOS 10.0, *)) {
                                          options:UNNotificationActionOptionForeground];
     
     // The UNNotificationCategoryOptionCustomDismissAction option allows to
-    // call the onNotificationTapped callback when the notiifcation is dismissed
+    // call the onNotificationAction callback when the notiifcation is dismissed
     UNNotificationCategory *newContentCategory = [UNNotificationCategory
                                                  categoryWithIdentifier:@"NewContent"
                                                  actions:@[viewAction, deleteAction, remindAction]
@@ -1231,7 +1231,7 @@ if #available(iOS 10.0, *) {
                                                                    comment: ""),
                                           options: .foreground)
   
-  // The customDismissAction option allows to call the onNotificationTapped
+  // The customDismissAction option allows to call the onNotificationAction
   // callback when the notiifcation is dismissed
   let newContentCategory =
     UNNotificationCategory(identifier: "NewContent",
@@ -1256,61 +1256,61 @@ To configure a custom sound:
 * Add a custom sound file to your app's main bundle or make your app store it in the `Library/Sounds` folder of your app's container directory. See more details about file location and format in [Apple documentation](https://developer.apple.com/documentation/usernotifications/unnotificationsound).
 * Enter the complete custom sound filename in the "Custom Sound" field of the campaign editor.
 
-### Implement custom behavior on notification tap
+### Implement custom behavior on notification action
 
-You can implement a custom behavior when the user taps on a notification by implementing the `onNotificationTapped` callback in [FollowAnalyticsConfiguration](#configuration). This allows you to perform specific actions when a notification is tapped:
+You can implement a custom behavior when the user taps on a notification by implementing the `onNotificationAction` callback in [FollowAnalyticsConfiguration](#configuration). This allows you to perform specific actions when a notification is tapped:
 
 ```Objective-C tab=
 FollowAnalyticsConfiguration* configuration = [FollowAnalyticsConfiguration
     configurationWith:^(FollowAnalyticsConfiguration* _Nonnull config) {
-        config.onNotificationTapped =
-            ^(FANotificationInfo* _Nonnull notificationInfo, NSString* _Nonnull actionIdentifier) {
+        
+        config.onNotificationAction = ^(FAActionInfo* _Nonnull actionInfo) {
             
-            if ([actionIdentifier isEqualToString:FANotificationDefaultActionIdentifier]) {
+            if ([actionInfo.identifier isEqualToString:FAActionPushOpen]) {
                 // Your behavior for a tap on the notification body
             
-            } else if ([actionIdentifier isEqualToString:FANotificationDismissActionIdentifier]) {
+            } else if ([actionInfo.identifier isEqualToString:FAActionPushDismiss]) {
                 
                 // Your behavior when the notification is dismissed (only for Interactive Notification)
             
-            } else if ([actionIdentifier isEqualToString:ActionIdentifierView]) {
+            } else if ([actionInfo.identifier isEqualToString:ActionIdentifierView]) {
                 
-                // Your behavior for a tap on the "View" action button
+                // Your behavior for a tap on the "View" action button (see example in Interaction Notification section)
             
-            } else if ([actionIdentifier isEqualToString:ActionIdentifierDelete]) {
+            } else if ([actionInfo.identifier isEqualToString:ActionIdentifierDelete]) {
                 
-                // Your behavior for a tap on the "Delete" action button
+                // Your behavior for a tap on the "Delete" action button (see example in Interaction Notification section)
             
-            } else if ([actionIdentifier isEqualToString:ActionIdentifierRemind]) {
+            } else if ([actionInfo.identifier isEqualToString:ActionIdentifierRemind]) {
             
-                // Your behavior for a tap on the "Remind me tomorrow" action button
+                // Your behavior for a tap on the "Remind me tomorrow" action button (see example in Interaction Notification section)
             
             }
-        }
-    };
-}];
+        };
+    }
+];
 ```
 
 ```Swift tab=
 let configuration = FollowAnalyticsConfiguration.init { (config) in
-    config.onNotificationTapped = { (notificationInfo, actionIdentifier) in
+    config.onNotificationAction = { (actionInfo) in
         
-        switch (actionIdentifier) {
+        switch (actionInfo.identifier) {
         
-        case FANotificationDefaultActionIdentifier:
+        case FAActionPushOpen:
           // Your behavior for a tap on the notification body
         
-        case FANotificationDismissActionIdentifier:
+        case FAActionPushDismiss:
           // Your behavior when the notification is dismissed (only for Interactive Notification)
         
         case ActionIdentifierView:
-          // Your behavior for a tap on the "View" action button
+          // Your behavior for a tap on the "View" action button (see example in Interaction Notification section)
         
         case ActionIdentifierDelete:
-          // Your behavior for a tap on the "Delete" action button
+          // Your behavior for a tap on the "Delete" action button (see example in Interaction Notification section)
         
         case ActionIdentifierRemind:
-          // Your behavior for a tap on the "Remind me later" action button
+          // Your behavior for a tap on the "Remind me later" action button (see example in Interaction Notification section)
         
         default:
           // Do nothing
@@ -1320,85 +1320,98 @@ let configuration = FollowAnalyticsConfiguration.init { (config) in
 ```
 
 !!! note "Add background fetch capability"
-    For your app to be woken-up to execute your implementation of `onNotificationTapped` when your app is in background, you must activate the `Background Fetch` capability in the `Background Modes`. This will be the case when the user tap a **category** notification button that does not open the app.
+    For your app to be woken-up to execute your implementation of `onNotificationAction` when your app is in background, you must activate the `Background Fetch` capability in the `Background Modes`. This will be the case when the user tap a **category** notification button that does not open the app.
 
-The SDK passes some **Push** campaign information to your app through this callback thanks to the `notificationInfo` argument, while the `actionIdentifier` argument provides information about which notification button has been tapped:
+The SDK passes some **Push** campaign information to your app through this callback thanks to the `actionInfo` argument:
 
-* `notificationInfo.messageId` is a `String` containing the FollowAnalytics message identifier. It can be used to retrieve the associated `FAMessage` by calling `FollowAnalytics.push.get(notificationInfo.messageId)`.
-* `notificationInfo.isSilent` is a `Boolean` telling if the notification is silent or not. In `onNotificationTapped`, this property is always `false`.
-* `notificationInfo.parameters` is an _optional_ `Dictionary` containing the key/value pairs defined in the campaign editor.
-* `notificationInfo.url` is an _optional_ `URL` containing **App Link** value defined in the campaign editor.
-* `actionIdentifier` is a `String` containing the identifier for the tap action. It can be either :
-    * `FANotificationDefaultActionIdentifier` when the user tapped on a regular notification, or on the body of an [Interactive Notification](#interactive-notifications).
-    * `FANotificationDismissActionIdentifier` when the user dismissed an [Interactive Notification](#interactive-notifications).
+* `actionInfo.messageId` is a `String` containing the FollowAnalytics message identifier. It can be used to retrieve the associated `FAMessage` by calling `FollowAnalytics.push.get(actionInfo.messageId)`.
+* `actionInfo.parameters` is a `Dictionary` containing the key/value pairs defined in the campaign editor.
+* `actionInfo.campaignName` is an _optional_ `String` containing the campaign name defined in the campaign editor.
+* `actionInfo.openingUrl` is an _optional_ `String` containing the url defined in the campaign editor.
+* `actionInfo.identifier` is a `String` containing the identifier for the tap action. It can be either :
+    * `FAActionPushOpen` when the user tapped on a regular notification, or on the body of an [Interactive Notification](#interactive-notifications).
+    * `FAActionPushDismiss` when the user dismissed an [Interactive Notification](#interactive-notifications).
     * Your custom action identifier when the user tapped on a custom button of an [Interactive Notification](#interactive-notifications).
 
 ### Implement custom behavior on Push reception
 
-You can implement a custom behavior when the device receives a message from a Push campaign that contains custom parameters (i.e. at least one key/value pair). This can be used to fetch data from your server if a particular custom parameter is defined in the Push message. To do so, implement the `onNotificationReceived` callback in [FollowAnalyticsConfiguration](#configuration):
+You can implement a custom behavior when the device receives a message from a Push campaign that contains custom parameters (i.e. at least one key/value pair). This can be used to fetch data from your server if a particular custom parameter is defined in the Push message. To do so, implement the `onPushMessageReceived` callback in [FollowAnalyticsConfiguration](#configuration):
 
 ```Objective-C tab=
 FollowAnalyticsConfiguration* configuration = [FollowAnalyticsConfiguration
     configurationWith:^(FollowAnalyticsConfiguration* _Nonnull config) {
-        config.onNotificationReceived = ^(FANotificationInfo * _Nonnull notificationInfo){
+        config.onPushMessageReceived = ^(FAMessage * _Nonnull message){
             // YOUR BEHAVIOR
-        }
-    };
-}];
+        };
+    }
+];
 ```
 
 ```Swift tab=
 let configuration = FollowAnalyticsConfiguration.init { (config) in
-    config.onNotificationReceived = { (notificationInfo) in
+    config.onPushMessageReceived = { (message) in
         // YOUR BEHAVIOR
     }
 }
 ```
 
 !!! note "Add background fetch capability"
-    For your app to be woken-up to execute your implementation of `onNotificationReceived` when your app is in background, you must activate the `Background Fetch` capability in the `Background Modes`. Note that your code implemented in in this callback must not take more that 30s to execute. Otherwise the callback execution will be stopped by iOS. As a consequence, when using this callback to fetch data, make sure data size not too big compared to the data connection speed of your users.
+    For your app to be woken-up to execute your implementation of `onPushMessageReceived` when your app is in background, you must activate the `Background Fetch` capability in the `Background Modes`. Note that your code implemented in in this callback must not take more that 30s to execute. Otherwise the callback execution will be stopped by iOS. As a consequence, when using this callback to fetch data, make sure data size not too big compared to the data connection speed of your users.
 
 !!! note "Implement only synchronous calls"
-    The SDK executes your `onNotificationReceived` code in a background thread and expects that the whole callback implementation is synchronous. Any asynchronous call is not guaranteed to finish before the end of the callback execution and then will be terminated at the time the callback execution is finished. Make sure that your implementation follows those rules, to ensure proper runtime execution:
+    The SDK executes your `onPushMessageReceived` code in a background thread and expects that the whole callback implementation is synchronous. Any asynchronous call is not guaranteed to finish before the end of the callback execution and then will be terminated at the time the callback execution is finished. Make sure that your implementation follows those rules, to ensure proper runtime execution:
 
     * All statements are synchronous calls.
     * No call to any API that should be called on the main thread.
 
-The SDK passes some **Push** campaign information to your app through this callback thanks to the `notificationInfo` argument:
+The SDK passes some **Push** campaign information to your app through this callback thanks to the `message` argument:
 
-* `notificationInfo.messageId` is a `String` containing the FollowAnalytics message identifier. It can be used to retrieve the associated `FAMessage` by calling `FollowAnalytics.push.get(notificationInfo.messageId)`.
-* `notificationInfo.isSilent` is a `Boolean` telling if the notification is silent or not.
-* `notificationInfo.parameters` is an _optional_ `Dictionary` containing the key/value pairs defined in the campaign editor. In `onNotificationReceived`, this property is always set with at least one key/value pair.
-* `notificationInfo.url` is an _optional_ `URL` containing **App Link** value defined in the campaign editor.
+* `message.isSilent` is a `Boolean` telling if the notification is silent or not.
+* `message.parameters` is a `Dictionary` containing the key/value pairs defined in the campaign editor. In `onPushMessageReceived`, this property is always set with at least one key/value pair.
+* `message.openingUrl` is an _optional_ `String` containing **App Link** value defined in the campaign editor.
 
-### Implement custom behavior on Native Alert button tap
+### Implement custom behavior on native InApp action
 
-You can implement a custom behavior when the user taps on a *Native Alert** button by implementing the `onNativeInAppButtonTapped` callback in the [FollowAnalyticsConfiguration](#configuration). This allows you to perform specific actions when a native alert button is tapped:
+The SDK has the following behavior when the user **closes** an native InApp (i.e. Native Alert or Evaluation Booster) by tapping on one of its native buttons:
+
+* If a URL has been defined for this button, the SDK will request the system to open this URL, depending on your implementation of the shouldOpenUrl() callback (see the [Opening URL section](#implement-custom-behavior-on-url-opening) for more details)
+
+* If no URL has been defined for this button, the SDK does nothing.
+
+You can define a URL on a Native Alert button in the platform's campaign editor. For Evaluation Booster campaign, a URL is automatically set on the **Rate** button of the Positive answer dialog.
+
+Additionally to the SDK behavior, you can define a custom behavior when the user closes a native InApp by implementing the `onInAppNativeAction` callback in [FollowAnalyticsConfiguration](#configuration). This allows your app to follow a specific logic for each closing button:
 
 ```Objective-C tab=
 FollowAnalyticsConfiguration* configuration = [FollowAnalyticsConfiguration
     configurationWith:^(FollowAnalyticsConfiguration* _Nonnull config) {
-        config.onNativeInAppButtonTapped =
-            ^(FACustomButtonInfo* _Nonnull buttonInfo) {
+        
+        config.onInAppNativeAction = ^(FAActionInfo* _Nonnull actionInfo) {
             // YOUR BEHAVIOR
-        }
-    };
-}];
+        };
+    }
+];
 ```
 
 ```Swift tab=
 let configuration = FollowAnalyticsConfiguration.init { (config) in
-    config.onNativeInAppButtonTapped = { (buttonInfo) in
+    config.onInAppNativeAction = { (actionInfo) in
         // YOUR BEHAVIOR
     }
 }
 ```
 
-The SDK passes some **Native Alert** campaign information to your app through this callback thanks to the `buttonInfo` argument:
+The SDK passes some native InApp campaign information to your app through this callback thanks to the `actionInfo` argument:
 
-* `buttonInfo.campaignId` is a `String` containing the FollowAnalytics campaign identifier.
-* `buttonInfo.parameters` is an _optional_ `Dictionary` containing the key/value pairs defined in the campaign editor.
-* `buttonInfo.url` is an _optional_ `URL` containing **App Link** value defined in the campaign editor.
+* `actionInfo.messageId` is a `String` containing the FollowAnalytics campaign identifier.
+* `actionInfo.parameters` is a `Dictionary` containing the key/value pairs defined in the campaign editor.
+* `actionInfo.campaignName` is an _optional_ `String` containing the campaign name defined in the campaign editor.
+* `actionInfo.openingUrl` is an _optional_ `String` containing the url defined in the campaign editor.
+* `actionInfo.identifier` is a `String` containing the identifier for the button tap action. It can be either :
+    * `FAActionClose` when an In-App Native Alert or Evaluation Booster "close" button is tapped by the user.
+    * `FAActionRate` when the Evaluation Booster "rate" button is tapped by the user.
+    * `FAActionPositive` when the Evaluation Booster dialog is closed after the "positive" answer is choosed by the user.
+    * `FAActionNegative` when the Evaluation Booster dialog is closed after the "negative" answer is choosed by the user.
 
 ### Controlling In-App campaigns
 
@@ -1431,13 +1444,14 @@ open var archivePushMessages: Bool { get }
 open var archiveInAppMessages: Bool { get }
 ```
 
-In `FollowAnalyticsInApp` and `FollowAnalyticsPush` protocols you will find all necessary methods to manage all `FAMessage` objects that are archived. They are implemented by `FollowAnalytics.inApp` and `FollowAnalytics.push`
+In `FollowAnalyticsInApp` and `FollowAnalyticsPush` protocols you will find all necessary methods to manage all `FAMessage` objects that are archived. They are implemented by `FollowAnalytics.inApp` and `FollowAnalytics.push` and must be called from the main thread.
 
 -   The methods are the following
 
 ```Objective-C tab=
 - (nonnull NSArray<FAMessage*>*)getAll;
 - (nullable FAMessage*)get:(nonnull NSString*)identifier;
+- (void)display:(nonnull NSString*)identifier;
 - (void)markAsRead:(nonnull NSArray<NSString*>*)identifiers;
 - (void)markAsUnread:(nonnull NSArray<NSString*>*)identifiers;
 - (void)deleteIdentifiers:(nonnull NSArray<NSString*>*)identifiers;
@@ -1446,6 +1460,7 @@ In `FollowAnalyticsInApp` and `FollowAnalyticsPush` protocols you will find all 
 ```Swift tab=
 func getAll() -> [FAMessage]
 func get(identifier : String) -> FAMessage
+func display(identifier : String)
 func markAsRead(identifiers : [String])
 func markAsUnread(identifiers : [String])
 func deleteIdentifiers(identifiers : [String])
@@ -1457,17 +1472,25 @@ Here is a description of some of the `FAMessage` attributes:
 | ---------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `isRead`               | boolean    | Indicates if the message has been read not not. False at message reception. Only modifiable by the InBoxManager.|
 | `isPush`               | boolean    | `true` if message comes from a Push campaign, `false` if it comes from a In-App campaign.|
-| `isInApp`              | boolean    | `true` if message comes from a In-App campaign, false` if it comes from a Push campaign.|
+| `isInApp`              | boolean    | `true` if message comes from a In-App campaign, `false` if it comes from a Push campaign.|
 | `isSilent`             | boolean    | `true` if message comes from a Push campaign with the "Silent" option enabled (silent push), `false` otherwise.|
+| `isNotificationDismissed`| boolean    | `true` if message comes from a non-silent Push Campaign and the related notification is dismissed, `false` otherwise.|
 | `identifier`           | string     | FollowAnalytics message identifier.|
-| `dateReceived`         | date       | If message comes from a Push campaign, this is the date at which the message is received on the device. If message comes from an In-App campaign, this is the start date of the campaign.|
+| `date`                 | date       | If message comes from a Push campaign, this is the date at which the message is received on the device. If message comes from an In-App campaign, this is the date a which the message is displayed on the device.|
 | `notificationId`       | string     | If message comes from a Push campaign, this is the `UNNotificationRequest` unique identifier (iOS >= 10.0), otherwise it's `nil`.|
+| `type`                 | string     | |
 | `title`                | string     | Text provided in the platform's "Title" field of the Push campaign editor.|
 | `subtitle`             | string     | Text provided in the platform's "Subtitle" field of the Push campaign editor.|
 | `body`                 | string     | Text provided in the platform's "Content" field of the Push campaign editor.|
-| `url`                  | string     | Url provided in the platform's "URL" field of In-App Custom Web Page campaign editor. If the message comes from a Push campaign, this is the url of the Rich Media.|
-| `deepLinkUrl`          | string     | Url provided in the platform's "App Link" field of the Push campaign editor.|
-| `params`               | dictionary | Key/Value pairs provided in the Push campaign editor.|
+| `contentUrl`           | string     | Url provided in the platform's "URL" field of In-App Custom Web Page campaign editor. If the message comes from a Push campaign, this is the url of the Rich Media.|
+| `layout`               | string     | |
+| `openingUrl`           | string     | Url provided in the platform's "App Link" field of the Push campaign editor.|
+| `parameters`           | dictionary | Key/Value pairs provided in the Push campaign editor.|
+| `category`             | string     | Interactive notification category.|
+
+### Re-display archived InApp messages
+
+From the SDK interface, you have access to the method `displayInApp()` on the `FAMessage` object that will re-display an In-App campaign. Calling this method from a Push message it will not trigger any re-display and will return `FALSE`. Also, this re-display doesn't have impact on the current recurring contextual In-Apps and will not trigger any log on the platform.
 
 
 ## Web Views
@@ -1571,7 +1594,7 @@ Here are the SDK methods you can call from the JavaScript code:
     FollowAnalytics.requestNotificationAuthorization(); // To request Notification authorization permissions.
     FollowAnalytics.requestProvisionalNotificationAuthorization(); // To request provisional Notification authorization.
     FollowAnalytics.isRegisteredForPushNotifications() // Get the Push campaigns registration status. Will return "true" only if the notification authorization is allowed AND the SDK opt-in notifications status is true. Otherwise, will return "false".
-    FollowAnalytics.openNotificationSettingsEventually();
+    FollowAnalytics.openNotificationSettingsIfNeeded();
     FollowAnalytics.setData("key", "value"); // To save and persist string data.
     FollowAnalytics.getData("key"); // To retrieve a previously saved string data from its key.
     ```
@@ -1620,6 +1643,7 @@ Here are the SDK methods you can call from the JavaScript code:
     FollowAnalytics.InApp.markAsUnread(['campaignId1', 'campaignId2'/*,..., 'campaignIdN'*/]);
     FollowAnalytics.InApp.delete(['campaignId1', 'campaignId2'/*,..., 'campaignIdN'*/]);
     FollowAnalytics.InApp.get("aCampaignId"); // Returns an campaign Message json object as a String
+    FollowAnalytics.InApp.display("aCampaignId"); // Attempt to redisplay the campaign from the archived Message given the campaign id.
     FollowAnalytics.InApp.getAll(); // Returns an array of campaign Message json object as a String
     ```
 
@@ -1635,8 +1659,8 @@ Here are the SDK methods you can call from the JavaScript code:
 
 - Badge:
     ```JavaScript
-    FollowAnalytics.Badge.set(1); // To update the app icon badge when Notifications are authorized with with badge.
-    FollowAnalytics.Badge.updateBy(1); // To increment the value of the app icon badge when Notifications are authorized with with badge.
+    FollowAnalytics.Badge.set(1); // To update the app icon badge when Notifications are authorized with badge.
+    FollowAnalytics.Badge.updateBy(1); // To increment the current value of the app icon badge when Notifications are authorized with badge.
     ```
 
 ## Disabling Swizzling
@@ -2046,22 +2070,43 @@ To customize the SDK behavior, you must define your desired SDK parameters by se
 | `isVerbose`                        | boolean   | false           | `true` to see internal logs made by the SDK in the console. Note that setting `isVerbose` to `true` will automatically set `apiMode` to `.dev`. So make sure to set `isVerbose` to `false` for production build. More information in the [Analytics section](#analytics).|
 | `apiMode`                          | enum      | .prod           | `.dev` or `.prod` for Swift, `FollowAnalyticsAPIModeDev` or `FollowAnalyticsAPIModeProd` for Objective-C. In Dev apiMode, logs, attributes and crashes sent by the SDK will be ignored by the platform, but you still can see them in the Device Observer. More information in the [Analytics section](#analytics).|
 | `optInAnalyticsDefault`            | boolean   | true            | `true` to make the user opt-in analytics by default. More information in the [Opt-in Analytics section](#opt-in-analytics).|
-| `optInNotificationsDefault`            | boolean   | true            | `true` to make the user opt-in notifications by default. More information in the [Opt-in Notifications section](#opt-in-notifications).|
+| `optInNotificationsDefault`        | boolean   | true            | `true` to make the user opt-in notifications by default. More information in the [Opt-in Notifications section](#opt-in-notifications).|
 | `crashReportingEnabled`            | boolean   | true            | `true` to enable FollowAnalytics crash reporting.|
-| `isDataWalletEnabled`              | boolean   | false           | `true` to enable DataWallet.|
-| `dataWalletDefaultPolicyPath`      | string    | -               | To define the path of your dataWallet policy .|
-| `onDataWalletPolicyChange`         | callback  | -               | Called when a new significant version of dataWallet policy is available.|
 | `archivePushMessages`              | boolean   | false           | `true` to archive **Push** campaigns messages. More information in the [Archiving messages section](#archiving-messages).|
 | `archiveInAppMessages`             | boolean   | false           | `true` to archive **In-App** campaigns messages. More information in the [Archiving messages section](#archiving-messages).|
 | `maxBackgroundTimeWithinSession`   | int       | 120             | To determine the lifetime of a session when in background (between 15 and 3600).|
-| `onNotificationTapped`             | callback  | -               | Called when user taps on a notification.|
-| `onNotificationReceived`           | callback  | -               | Called when device receives a message from a Push campaign that contains custom parameters (i.e. at least one key/value pair).|
-| `onNativeInAppButtonTapped`        | callback  | -               | Called when user taps on a custom button of a Native Alert In-App campaign.|
+| `onPushMessageReceived`            | callback  | -               | Called when device receives a message from a Push campaign that contains custom parameters (i.e. at least one key/value pair).|
+| `onNotificationAction`             | callback  | -               | Called when user taps on a notification.|
+| `onInAppNativeAction`              | callback  | -               | Called when user taps on a custom button of a Native Alert In-App campaign.|
 | `shouldOpenURL`                    | callback  | true            | Called when user taps on a URL (website links or custom URL schemes) from a **Push** or **In-App** campaigns. This callback returns a boolean value indicating to the SDK if it should call `open(_:options:completionHandler:)` or not. More information in the [Implement custom behavior on URL opening section](#implement-custom-behavior-on-url-opening).|
 | `swizzlingEnabled`                 | boolean   | true            | `false` to disable the Swizzling process. More information in the [Disabling swizzling section](#disabling-swizzling).|
 | `lastKnownLocationEnabled`         | boolean   | false           | `true` to enable the logging of the last known location when the session starts.|
 
 ## Updating from older versions
+
+#### Updating from 6.9 to 7.0
+- Replace your call to `openNotificationSettingsEventually()` by `openNotificationSettingsIfNeeded()`.
+- Replace your call to `onNotificationTapped()` by `onNotificationAction()`. Now it takes a non-null `actionInfo` object. More informationin in the [onNotificationAction section](#implement-custom-behavior-on-notification-action).
+- Replace your call to `onNativeInAppButtonTapped()` by `onInAppNativeAction()`. Now it takes a non-null `actionInfo` object. More information in the [onInAppNativeAction section](#implement-custom-behavior-on-native-inapp-action).
+- Replace your call to `onNotificationReceived()` by `onPushMessageReceived()`. Now it takes a non-null `message` object. More informationin in the [onPushMessageReceived section](#implement-custom-behavior-on-push-reception).
+- Rename the constant `FANotificationDefaultActionIdentifier` to `FAActionPushOpen`.
+- Rename the constant `FANotificationDismissActionIdentifier` to `FAActionPushDismiss`.
+- Replace the usage of the `FABadge` interface with `FollowAnalytics.badge`.
+- All calls to `FollowAnalytics.inApp.*` and `FollowAnalytics.push.*` methods must now be made on the UI thread. More information in the [Archiving messages section](#archiving-messages).
+- Deprecated static methods from `FAInApp` are now removed and fully replaced by `FollowAnalytics.inApp` methods.
+- Deprecated static methods from `FAPush` are now removed and fully replaced by `FollowAnalytics.push` methods.
+- Update the usage of the `FAMessage` fields according ot its new signature. Rename `dateReceived` by `date`, `params` by `parameters`, `url` by `contentUrl`, `deepLinkUrl` by `openingUrl`.
+- The `FAMessage.date` for InApps no longer refers to the start date of the campaign. Now it is the last time the campaign was displayed.
+- The field `parameters` on `FAMessage` no longer can be null, if there is no key values it will be an empty Dictionary.
+- The field `rawData` on `FAMessage` is now removed from the Javascript object.
+- The Message field `is_read` on the Javascript bridge is now named `isRead`.
+- The Message field `is_push` on the Javascript bridge is now named `isPush`.
+- The Message field `is_inapp` on the Javascript bridge is now named `isInApp`.
+- The Message field `is_silent` on the Javascript bridge is now named `isSilent`.
+- The Message field `notification_id` on the Javascript bridge is now named `notificationId`.
+- The Message field `content_url` on the Javascript bridge is now named `contentUrl`.
+- The Message field `opening_url` on the Javascript bridge is now named `openingUrl`.
+
 
 #### Updating from 6.8 to 6.9
 - Before v6.9.0, if the `apiMode` was not explicitly defined in the `Configuration`, the SDK was automatically changing it based on the `isVerbose` value. From v6.9.0 the SDK will no longer change the `apiMode` automatically on real device and we recommend that you set it explicitly in your code, based on the Xcode `DEBUG` flag like this:
@@ -2081,7 +2126,7 @@ To customize the SDK behavior, you must define your desired SDK parameters by se
       #else
       config.apiMode = FollowAnalyticsAPIModeProd;
       #endif
-    }];
+  }];
   [FollowAnalytics startWithConfiguration:configuration startupOptions:launchOptions];
   //....
 }
