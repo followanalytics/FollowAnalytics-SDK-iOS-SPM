@@ -26,7 +26,7 @@ Once the integration is finished, we highly recommend you test the setup. Then, 
     **Before you start**, make sure to have a *Podfile*. You could create one by writing `pod init` in your terminal in your project. To open your *Podfile*, you could find it in your *Workspace*, or by writing `open -a Xcode Podfile` in the terminal.
 
 
-1.  Add `pod 'FollowAnalytics','~> 7.1.0'` in the _Podfile_ (see screenshot below)
+1.  Add `pod 'FollowAnalytics','~> 7.2.0'` in the _Podfile_ (see screenshot below)
     ![](https://s3-eu-west-1.amazonaws.com/fa-assets/documentation/podfile-add-pod.png)
     
 2.  Run `pod repo update` from the command line. This will enable CocoaPods to detect the latest available version of FollowAnalytics.
