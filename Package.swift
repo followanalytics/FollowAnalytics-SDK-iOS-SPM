@@ -19,7 +19,7 @@ let package = Package(
     dependencies: [
     ],
     targets: [
-        .binaryTarget(name: "FollowAnalytics", url: "https://s3-eu-west-1.amazonaws.com/fa-sdks/ios/7.2.0-1.0.3/FollowAnalytics-7.2.0.xcframework.zip", checksum: "63188a242c4bdc4236e4082e8a72d53ddbb26553f2907d120c95d0558b621322"),
-        .binaryTarget(name: "FANotificationExtension", url: "https://s3-eu-west-1.amazonaws.com/fa-sdks/ios/7.2.0-1.0.3/FANotificationExtension-1.0.3.xcframework.zip", checksum: "54143e98e943ff4e7c8d179d5970d5fdd603113544e538b7416eac3db96cf981")
+        .binaryTarget(name: "FollowAnalytics", url: "https://s3-eu-west-1.amazonaws.com/fa-sdks/ios/7.2.1-1.0.3/FollowAnalytics-7.2.1.xcframework.zip", checksum: "9a2a5daea3a74b1116f55011ef6b5895801fd72e37314a757dfc138eaf226525"),
+        .binaryTarget(name: "FANotificationExtension", url: "https://s3-eu-west-1.amazonaws.com/fa-sdks/ios/7.2.1-1.0.3/FANotificationExtension-1.0.3.xcframework.zip", checksum: "c5cb6f8c615497d770b554a5fa0055ef363e88cfd2f93406e41af5cf4a826d6f")
     ]
 )
