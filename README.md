@@ -1621,7 +1621,7 @@ Here are the SDK methods you can call from the JavaScript code:
     FollowAnalytics.UserAttributes.setLastName("aLastName");
     FollowAnalytics.UserAttributes.setEmail("something@domain.com");
     FollowAnalytics.UserAttributes.setDateOfBirth(new Date("1998-08-01"));
-    FollowAnalytics.UserAttributes.setGender(FollowAnalytics.Gender.MALE); // Can be MALE, FEMALE or OTHER
+    FollowAnalytics.UserAttributes.setGender(FollowAnalytics.Gender.MALE); // Can be MALE, FEMALE, OTHER or null
     FollowAnalytics.UserAttributes.setCountry("France");
     FollowAnalytics.UserAttributes.setCity("Paris");
     FollowAnalytics.UserAttributes.setRegion("Île-de-France");
@@ -1632,7 +1632,9 @@ Here are the SDK methods you can call from the JavaScript code:
     FollowAnalytics.UserAttributes.setString("aKey", "aString");
     FollowAnalytics.UserAttributes.setBoolean("aKey", true);
     FollowAnalytics.UserAttributes.addToSet("aSetKey", "aSetElement");
+    FollowAnalytics.UserAttributes.addToSet("aSetKey", ["aSetElement", "anotherSetElement"]);
     FollowAnalytics.UserAttributes.removeFromSet("aSetKey", "aSetElement");
+    FollowAnalytics.UserAttributes.removeFromSet("aSetKey", ["aSetElement", "anotherSetElement"]);
     FollowAnalytics.UserAttributes.clear("aKey");
     FollowAnalytics.UserAttributes.clearSet("aSetKey");
     ```
